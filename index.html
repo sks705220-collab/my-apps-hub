@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shailesh - Apps Portfolio Hub</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8 border-b pb-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Shailesh's Apps Portfolio</h1>
+                <p class="text-gray-600 text-sm mt-1">Client Showcase & Live Web Applications Hub</p>
+            </div>
+            <button onclick="toggleAddModal()" class="mt-4 md:mt-0 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition shadow">
+                + Add New App
+            </button>
+        </header>
+
+        <!-- Apps Grid Container -->
+        <div id="appsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamic Apps will load here -->
+        </div>
+    </div>
+
+    <!-- Add App Modal / Form Drawer -->
+    <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Add New Web Application</h2>
+            <form id="appForm" onsubmit="saveApp(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-1">App Name</label>
+                    <input type="text" id="appName" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g. Inventory Tracker">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-1">Description</label>
+                    <textarea id="appDesc" rows="3" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Short description of what the app does..."></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-1">Live App URL (Link)</label>
+                    <input type="url" id="appUrl" required class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="https://your-app-link.com">
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="toggleAddModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-400">Cancel</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">Save App</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript for Logic -->
+    <script>
+        // Initial Default Apps (Aapke purane apps pehle se jude rahenge)
+        let defaultApps = [
+            {
+                name: "Greenpack ERP System",
+                desc: "Cloud-based ERP for production planning, reel inventory management, sales invoicing, and maintenance tracking.",
+                url: "#" // Yahan apna live link daal sakte hain
+            },
+            {
+                name: "Expenze Finance App",
+                desc: "Personal finance manager with income, expense tracking, scooty mileage, and credit card management.",
+                url: "#"
+            },
+            {
+                name: "Production Data Entry",
+                desc: "Google Sheets integrated real-time data entry web app for managing department-wise records.",
+                url: "#"
+            }
+        ];
+
+        // Load apps from LocalStorage or use default
+        function getApps() {
+            let savedApps = localStorage.getItem('shaileshApps');
+            return savedApps ? JSON.parse(savedApps) : defaultApps;
+        }
+
+        // Render Apps on Screen
+        function renderApps() {
+            const grid = document.getElementById('appsGrid');
+            const apps = getApps();
+            grid.innerHTML = '';
+
+            apps.forEach((app, index) => {
+                grid.innerHTML += `
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col justify-between hover:shadow-md transition">
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-800">${app.name}</h2>
+                            <p class="text-gray-600 text-sm mt-2">${app.desc}</p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between">
+                            <a href="${app.url}" target="_blank" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition">
+                                Open App &rarr;
+                            </a>
+                            <button onclick="deleteApp(${index})" class="text-red-500 hover:text-red-700 text-xs font-medium">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Toggle Modal Visibility
+        function toggleAddModal() {
+            const modal = document.getElementById('addModal');
+            modal.classList.toggle('hidden');
+        }
+
+        // Save New App
+        function saveApp(e) {
+            e.preventDefault();
+            const name = document.getElementById('appName').value;
+            const desc = document.getElementById('appDesc').value;
+            const url = document.getElementById('appUrl').value;
+
+            let apps = getApps();
+            apps.push({ name, desc, url });
+            localStorage.setItem('shaileshApps', JSON.stringify(apps));
+
+            // Reset Form and Close Modal
+            document.getElementById('appForm').reset();
+            toggleAddModal();
+            renderApps();
+        }
+
+        // Delete App
+        function deleteApp(index) {
+            if(confirm("Kya aap sach mein is app ko remove karna chahte hain?")) {
+                let apps = getApps();
+                apps.splice(index, 1);
+                localStorage.setItem('shailessApps', JSON.stringify(apps));
+                // Fix key spelling consistency
+                localStorage.setItem('shaileshApps', JSON.stringify(apps));
+                renderApps();
+            }
+        }
+
+        // Initial Load
+        renderApps();
+    </script>
+</body>
+</html>
